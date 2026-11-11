@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Portfolio Optimizer — Preview</title>
+<style>
+.viz-root{color-scheme:light;--page:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;--grid:#e1e0d9;--axis:#c3c2b7;--border:rgba(11,11,11,.10);
+--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--good:#0ca30c;--goodtext:#006300;--bad:#d03b3b;--warn:#fab219;--band:rgba(42,120,214,.10)}
+@media (prefers-color-scheme:dark){:root:where(:not([data-theme="light"])) .viz-root{color-scheme:dark;--page:#0d0d0d;--surface:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);
+--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--goodtext:#0ca30c;--band:rgba(57,135,229,.16)}}
+*{box-sizing:border-box}
+body{margin:0}
+.viz-root{background:var(--page);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 24px 60px}
+h1{font-size:24px;line-height:1.25;margin:0 0 6px;font-weight:650;text-wrap:balance}
+h2{font-size:16px;margin:0 0 4px;font-weight:600}
+.sub{color:var(--ink2);font-size:13px}
+.banner{margin:14px 0 4px;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px;color:var(--ink2);display:flex;gap:10px;align-items:flex-start}
+.banner b{color:var(--ink)}
+.banner .ico{color:var(--warn);font-size:16px;line-height:1.2}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:18px 0}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.tile .k{font-size:12px;color:var(--ink2)}
+.tile .v{font-size:26px;font-weight:600;margin:2px 0}
+.tile .s{font-size:12px;color:var(--muted)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--border);margin-top:8px}
+.tab{appearance:none;border:0;background:none;color:var(--ink2);font:inherit;padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:600}
+.tab:hover{color:var(--ink)}
+.panel{display:none;padding-top:18px}
+.panel.on{display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 16px 10px;margin-bottom:16px;position:relative}
+.card .desc{color:var(--ink2);font-size:12.5px;margin-bottom:8px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin:4px 0 6px}
+.legend i{display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.legend i.dot{width:10px;height:10px;border-radius:50%}
+svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{fill:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--border);box-shadow:0 4px 14px rgba(0,0,0,.12);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--ink);opacity:0;transition:opacity .08s;z-index:5;white-space:nowrap}
+.tip .t{color:var(--ink2);margin-bottom:4px}
+.tip .r{display:flex;align-items:center;gap:6px;justify-content:space-between}
+.tip .r span:first-child{display:flex;align-items:center;gap:6px;color:var(--ink2)}
+.tip .sw{width:8px;height:8px;border-radius:50%}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:right;padding:7px 10px;border-bottom:1px solid var(--grid);font-variant-numeric:tabular-nums;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:600;color:var(--ink2);font-size:12px}
+.tblwrap{overflow-x:auto}
+.bull{color:var(--goodtext);font-weight:600}.bear{color:var(--bad);font-weight:600}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px}
+.seg button{appearance:none;border:0;background:var(--surface);color:var(--ink2);font:inherit;padding:6px 14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--page)}
+.wbar{height:10px;border-radius:0 4px 4px 0;display:inline-block;vertical-align:middle}
+input[type=number]{font:inherit;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--ink);width:160px}
+.note{color:var(--ink2);font-size:12.5px}
+.mods{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.mod{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.mod b{display:block;margin-bottom:2px}
+.mod code{font-size:12px;color:var(--ink2)}
+pre{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:12.5px;overflow-x:auto;color:var(--ink2);line-height:1.5}
+.ndcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+</style>
+</head>
+<body>
+<div class="viz-root">
+<div class="wrap">
+  <h1>AI-Driven Portfolio Optimization &amp; Market Direction Prediction</h1>
+  <div class="sub">Modern Portfolio Theory · Machine Learning · Real-Time Financial Data — <span id="meta"></span></div>
+  <div class="banner" id="banner"></div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="tabs" role="tablist" id="tabs"></div>
+
+  <section class="panel" data-tab="Portfolio">
+    <div class="card"><h2>Growth of $1</h2><div class="desc">Max-Sharpe portfolio vs equal weight vs the S&amp;P 500. Weights are fitted on this same period, so this is an in-sample (hindsight) view, not a back-test.</div><div class="legend" id="lg-growth"></div><div id="ch-growth"></div></div>
+    <div class="grid2">
+      <div class="card"><h2>Optimal allocation</h2><div class="desc">Long-only, weights sum to 100%, per-asset cap <span id="cap"></span>.</div><div class="tblwrap" id="tb-weights"></div></div>
+      <div class="card"><h2>Portfolio comparison</h2><div class="desc">Annualised from daily returns × 252.</div><div class="tblwrap" id="tb-perf"></div></div>
+    </div>
+  </section>
+
+  <section class="panel" data-tab="Stock forecast">
+    <div class="seg" id="seg"></div>
+    <div class="ndcards" id="nd"></div>
+    <div class="card"><h2 id="px-title">Price &amp; indicators</h2><div class="desc">Last 180 sessions: close, SMA20, SMA50 and the Bollinger band (20, 2σ).</div><div class="legend" id="lg-px"></div><div id="ch-px"></div></div>
+    <div class="grid2">
+      <div class="card"><h2>Next-day close: predicted vs actual</h2><div class="desc">Chronological hold-out (last 20% of history), final 90 days shown.</div><div class="legend" id="lg-pred"></div><div id="ch-pred"></div></div>
+      <div class="card"><h2>RSI (14)</h2><div class="desc">Dotted lines at 30 (oversold) and 70 (overbought).</div><div id="ch-rsi"></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h2>Price models vs naive baseline</h2><div class="desc">Lower RMSE is better. A model that can't beat "tomorrow = today" adds no information.</div><div class="tblwrap" id="tb-reg"></div></div>
+      <div class="card"><h2>Direction classifiers</h2><div class="desc">Accuracy vs always guessing the more common side.</div><div class="tblwrap" id="tb-clf"></div></div>
+    </div>
+  </section>
+
+  <section class="panel" data-tab="Bull / Bear signal">
+    <div class="card"><h2>Next-session market signal</h2><div class="desc">Classifier with the best hold-out ROC AUC per ticker, refit on all history.</div><div class="tblwrap" id="tb-sig"></div>
+    <p class="note">Confidence is the classifier's probability for the predicted side — read it next to the hold-out accuracy on the Stock forecast tab. The signal (classifier) and predicted return (regressor) are separate models, so they can disagree when neither has a strong view.</p></div>
+  </section>
+
+  <section class="panel" data-tab="Efficient frontier">
+    <div class="card"><h2>Efficient frontier</h2><div class="desc"><span id="nrand"></span> random long-only portfolios, shaded by Sharpe ratio (darker = higher). Line = minimum volatility for each target return.</div><div class="legend" id="lg-fr"></div><div id="ch-fr"></div></div>
+  </section>
+
+  <section class="panel" data-tab="Daily gain estimator">
+    <div class="card"><h2>Speculative daily gain estimate</h2>
+      <div class="desc">Gain = capital × predicted next-day return of the Max-Sharpe portfolio (model forecasts weighted by allocation).</div>
+      <label>Capital ($) <input type="number" id="capital" value="10000" step="1000" min="0"></label>
+      <div class="tblwrap" style="margin-top:12px" id="tb-gain"></div>
+      <p class="note">The ±1 sd band comes from the models' residual error; the VaR column is the loss exceeded on 1 day in 20 historically. Treat the point estimate as a rough guide, not an expected profit.</p>
+    </div>
+  </section>
+
+  <section class="panel" data-tab="Risk dashboard">
+    <div class="card"><h2>Risk metrics</h2><div class="desc">VaR/CVaR are 1-day historical losses. Beta and Treynor are against the S&amp;P 500.</div><div class="tblwrap" id="tb-risk"></div></div>
+    <div class="card"><h2>Max-Sharpe portfolio drawdown</h2><div class="desc">Peak-to-trough decline of portfolio value.</div><div id="ch-dd"></div></div>
+  </section>
+
+  <section class="panel" data-tab="Project">
+    <div class="card"><h2>Modules</h2><div class="mods" id="mods"></div></div>
+    <div class="card"><h2>Repository layout</h2><pre id="tree"></pre></div>
+  </section>
+</div>
+</div>
+
+<script>
+const R = /*__RESULTS__*/null;
+const $ = s => document.querySelector(s);
+const css = v => getComputedStyle(document.querySelector('.viz-root')).getPropertyValue(v).trim();
+const pct = (v, d=1) => v == null || isNaN(v) ? '—' : (v*100).toFixed(d) + '%';
+const usd = v => (v < 0 ? '−$' : '$') + Math.abs(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const num = (v,d=2) => v == null || isNaN(v) ? '—' : (+v).toFixed(d);
+const SER = ['--s1','--s2','--s3','--s4'];
+const tcol = t => css(SER[R.tickers.indexOf(t) % 4]);
+
+/* ---------- header ---------- */
+$('#meta').textContent = `${R.start} → ${R.end} · risk-free ${pct(R.risk_free,2)}`;
+const synthetic = /SYNTHETIC/i.test(R.source);
+$('#banner').innerHTML = synthetic
+  ? `<span class="ico">⚠</span><div><b>Sample data preview.</b> These numbers come from simulated random-walk prices because this preview was built without market-data access. Run <code>python run.py</code> on your machine (F5 in VS Code) to rebuild it from live Yahoo Finance data. On a random walk the ML models <i>should</i> land near 50% accuracy — that's the correct, leak-free behaviour.</div>`
+  : `<span class="ico" style="color:var(--good)">●</span><div>Data source: <b>${R.source}</b>. Educational project — not investment advice.</div>`;
+
+const P = R.performance['Max Sharpe'], RK = R.risk['Max Sharpe Portfolio'];
+$('#tiles').innerHTML = [
+  ['Expected return', pct(P.Return), 'Max-Sharpe, historical (in-sample)'],
+  ['Volatility', pct(P.Volatility), 'annualised σ'],
+  ['Sharpe ratio', num(P.Sharpe), '(Rp − Rf) / σp'],
+  ['1-day VaR 95%', pct(RK['VaR 95% (1d)'],2), 'historical'],
+  ['Max drawdown', pct(RK['Max Drawdown']), 'peak to trough'],
+].map(([k,v,s]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join('');
+
+/* ---------- tabs ---------- */
+const panels = [...document.querySelectorAll('.panel')];
+$('#tabs').innerHTML = panels.map((p,i) => `<button class="tab" role="tab" aria-selected="${i===0}" data-i="${i}">${p.dataset.tab}</button>`).join('');
+panels[0].classList.add('on');
+$('#tabs').addEventListener('click', e => {
+  const b = e.target.closest('.tab'); if (!b) return;
+  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x === b));
+  panels.forEach((p,i) => p.classList.toggle('on', i === +b.dataset.i));
+  drawAll();
+});
+
+/* ---------- tiny chart kit ---------- */
+function niceTicks(lo, hi, n=5){
+  const span = hi - lo || 1, step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0)));
+  const step = [1,2,2.5,5,10].map(m => m*mag).find(s => span/s <= n) || 10*mag;
+  const out = []; for (let v = Math.ceil(lo/step)*step; v <= hi + 1e-9; v += step) out.push(+v.toFixed(10));
+  return out;
+}
+function legend(el, items){
+  el.innerHTML = items.map(it => `<span><i class="${it.dot?'dot':''}" style="background:${it.color};${it.dash?'background:repeating-linear-gradient(90deg,'+it.color+' 0 4px,transparent 4px 7px)':''}"></i>${it.name}</span>`).join('');
+}
+function tipEl(host){
+  host.style.position = 'relative';
+  let t = host.querySelector('.tip'); if (!t){ t = document.createElement('div'); t.className = 'tip'; host.appendChild(t); }
+  return t;
+}
+function placeTip(tip, host, x, y){
+  const w = tip.offsetWidth, hw = host.clientWidth;
+  tip.style.left = Math.min(Math.max(x + 14, 0), hw - w - 4) + 'px';
+  if (x + 14 + w > hw) tip.style.left = Math.max(x - w - 14, 0) + 'px';
+  tip.style.top = Math.max(y - 10, 0) + 'px';
+  tip.style.opacity = 1;
+}
+
+/* line chart: x = date strings, series [{name,values,color,dash,width}], band {lo,hi} */
+function lineChart(host, {x, series, band, yFmt = v => v.toFixed(2), h = 280, refLines = [], yMin, yMax, area}){
+  const W = host.clientWidth || 600, H = h, m = {l:52, r:14, t:10, b:26};
+  const vals = series.flatMap(s => s.values).concat(band ? band.lo.concat(band.hi) : []).filter(v => v != null && !isNaN(v));
+  let lo = yMin ?? Math.min(...vals), hi = yMax ?? Math.max(...vals);
+  if (area) { lo = Math.min(lo, 0); hi = Math.max(hi, 0); }
+  const pad = (hi - lo) * 0.05; if (yMin == null) lo -= pad; if (yMax == null) hi += pad;
+  const ticks = niceTicks(lo, hi);
+  const X = i => m.l + (W - m.l - m.r) * i / (x.length - 1), Y = v => m.t + (H - m.t - m.b) * (1 - (v - lo) / (hi - lo));
+  const path = vs => vs.map((v,i) => v == null || isNaN(v) ? '' : `${i && vs[i-1] != null && !isNaN(vs[i-1]) ? 'L' : 'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join('');
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img">`;
+  ticks.forEach(t => { s += `<line x1="${m.l}" x2="${W-m.r}" y1="${Y(t)}" y2="${Y(t)}" stroke="${css('--grid')}" stroke-width="1"/><text x="${m.l-8}" y="${Y(t)+4}" text-anchor="end">${yFmt(t)}</text>`; });
+  const nx = Math.min(6, x.length); for (let k = 0; k < nx; k++){ const i = Math.round(k*(x.length-1)/(nx-1)); s += `<text x="${X(i)}" y="${H-6}" text-anchor="${k===0?'start':k===nx-1?'end':'middle'}">${x[i].slice(0,7)}</text>`; }
+  refLines.forEach(v => { s += `<line x1="${m.l}" x2="${W-m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="${css('--muted')}" stroke-dasharray="3 4"/>`; });
+  if (band){ const top = band.hi.map((v,i)=>`${i?'L':'M'}${X(i)},${Y(v)}`).join(''); const bot = band.lo.map((v,i)=>[i,v]).reverse().map(([i,v])=>`L${X(i)},${Y(v)}`).join(''); s += `<path d="${top}${bot}Z" fill="${css('--band')}"/>`; }
+  if (area){ const sv = series[0]; s += `<path d="${path(sv.values)}L${X(x.length-1)},${Y(0)}L${X(0)},${Y(0)}Z" fill="${sv.color}" opacity=".14"/>`; }
+  series.forEach(sv => { s += `<path d="${path(sv.values)}" fill="none" stroke="${sv.color}" stroke-width="${sv.width||2}" ${sv.dash?'stroke-dasharray="5 4"':''} stroke-linejoin="round" stroke-linecap="round"/>`; });
+  s += `<line class="xh" y1="${m.t}" y2="${H-m.b}" stroke="${css('--axis')}" stroke-width="1" opacity="0"/>`;
+  s += series.map((sv,k) => `<circle class="hd" data-k="${k}" r="4" fill="${sv.color}" stroke="${css('--surface')}" stroke-width="2" opacity="0"/>`).join('');
+  s += `<rect x="${m.l}" y="${m.t}" width="${W-m.l-m.r}" height="${H-m.t-m.b}" fill="transparent"/></svg>`;
+  host.innerHTML = s;
+  const svg = host.querySelector('svg'), tip = tipEl(host), xh = svg.querySelector('.xh'), dots = svg.querySelectorAll('.hd');
+  svg.addEventListener('mousemove', e => {
+    const r = svg.getBoundingClientRect(), sx = (e.clientX - r.left) * W / r.width;
+    const i = Math.max(0, Math.min(x.length - 1, Math.round((sx - m.l) / (W - m.l - m.r) * (x.length - 1))));
+    xh.setAttribute('x1', X(i)); xh.setAttribute('x2', X(i)); xh.setAttribute('opacity', 1);
+    dots.forEach(d => { const v = series[+d.dataset.k].values[i]; if (v == null || isNaN(v)) { d.setAttribute('opacity',0); return; } d.setAttribute('cx', X(i)); d.setAttribute('cy', Y(v)); d.setAttribute('opacity', 1); });
+    tip.innerHTML = `<div class="t">${x[i]}</div>` + series.map(sv => `<div class="r"><span><i class="sw" style="background:${sv.color}"></i>${sv.name}</span><b>${sv.values[i]==null||isNaN(sv.values[i])?'—':yFmt(sv.values[i])}</b></div>`).join('')
+      + (band ? `<div class="r"><span>Band</span><b>${yFmt(band.lo[i])} – ${yFmt(band.hi[i])}</b></div>` : '');
+    placeTip(tip, host, X(i) * r.width / W, e.clientY - host.getBoundingClientRect().top);
+  });
+  svg.addEventListener('mouseleave', () => { tip.style.opacity = 0; xh.setAttribute('opacity', 0); dots.forEach(d => d.setAttribute('opacity', 0)); });
+}
+
+/* ---------- Portfolio tab ---------- */
+function drawGrowth(){
+  const g = R.growth, ser = [
+    {name:'Max Sharpe', values:g['Max Sharpe'], color:css('--s1')},
+    {name:'Equal Weight', values:g['Equal Weight'], color:css('--s2')},
+  ];
+  if (g['S&P 500'].length) ser.push({name:'S&P 500', values:g['S&P 500'], color:css('--muted'), dash:true});
+  legend($('#lg-growth'), ser);
+  lineChart($('#ch-growth'), {x:g.dates, series:ser, yFmt: v => '$' + v.toFixed(2), h:300});
+}
+(function tables(){
+  const caps = Math.max(...R.tickers.map(t => R.weights['Max Sharpe'][t]));
+  $('#cap').textContent = R.max_weight ? pct(R.max_weight,0) : 'none';
+  const cols = ['Max Sharpe','Min Variance','Equal Weight'];
+  $('#tb-weights').innerHTML = `<table><tr><th>Stock</th>${cols.map(c=>`<th>${c}</th>`).join('')}</tr>` +
+    R.tickers.map(t => `<tr><td><i class="sw" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${tcol(t)};margin-right:8px"></i>${t}</td>${cols.map(c => {
+      const w = R.weights[c][t]; return `<td><span class="wbar" style="width:${Math.round(w*70)}px;background:${tcol(t)};margin-right:8px;${w<0.001?'display:none':''}"></span>${pct(w)}</td>`; }).join('')}</tr>`).join('') + '</table>';
+  $('#tb-perf').innerHTML = `<table><tr><th>Portfolio</th><th>Return</th><th>Volatility</th><th>Sharpe</th></tr>` +
+    cols.map(c => { const p = R.performance[c]; return `<tr><td>${c}</td><td>${pct(p.Return)}</td><td>${pct(p.Volatility)}</td><td>${num(p.Sharpe)}</td></tr>`; }).join('') +
+    `</table><p class="note">Per-stock annual return / volatility</p><table><tr><th>Stock</th><th>Return</th><th>Volatility</th><th>MA-crossover P&amp;L</th><th>Buy &amp; hold</th></tr>` +
+    R.tickers.map((t,i) => `<tr><td>${t}</td><td>${pct(R.annual_return[t])}</td><td>${pct(R.annual_vol[i])}</td><td>${usd(R.strategy[t]['Total profit (strategy, $/share)'])}</td><td>${usd(R.strategy[t]['Total profit (buy & hold, $/share)'])}</td></tr>`).join('') + '</table>';
+})();
+
+/* ---------- Forecast tab ---------- */
+let cur = R.tickers[0];
+$('#seg').innerHTML = R.tickers.map(t => `<button aria-pressed="${t===cur}" data-t="${t}">${t}</button>`).join('');
+$('#seg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; cur = b.dataset.t;
+  document.querySelectorAll('#seg button').forEach(x => x.setAttribute('aria-pressed', x === b)); drawForecast(); });
+function sigHTML(s){ return s.signal === 'Bullish' ? `<span class="bull">▲ Bullish</span>` : `<span class="bear">▼ Bearish</span>`; }
+function drawForecast(){
+  const F = R.forecasts[cur], I = R.indicators[cur], nd = F.next_day, sg = F.signal;
+  $('#nd').innerHTML = [
+    ['Signal (next session)', sigHTML(sg), `confidence ${pct(sg.confidence,0)} · ${sg.model}`],
+    ['Predicted open', usd(nd.pred_open), `last close ${usd(nd.last_close)}`],
+    ['Predicted close', usd(nd.pred_close), `${nd.pred_return>=0?'+':''}${pct(nd.pred_return,2)} · ${nd.model}`],
+    ['RSI 14 / Stoch %K', `${num(I.latest.RSI14,1)} / ${num(I.latest.Stoch_K,1)}`, `MACD ${num(I.latest.MACD)} · ATR ${num(I.latest.ATR14)}`],
+  ].map(([k,v,s]) => `<div class="tile"><div class="k">${k}</div><div class="v" style="font-size:22px">${v}</div><div class="s">${s}</div></div>`).join('');
+  $('#px-title').textContent = `${cur} price & indicators`;
+  const ser = [{name:'Close', values:I.Close, color:tcol(cur)}, {name:'SMA20', values:I.SMA20, color:css(cur===R.tickers[1]?'--s3':'--s2'), width:1.5}, {name:'SMA50', values:I.SMA50, color:css('--muted'), width:1.5, dash:true}];
+  legend($('#lg-px'), ser.concat([{name:'Bollinger band', color:css('--band'), dot:true}]));
+  lineChart($('#ch-px'), {x:I.dates, series:ser, band:{lo:I.BB_Lower, hi:I.BB_Upper}, yFmt: v => '$' + v.toFixed(v < 100 ? 2 : 0), h:300});
+  const T = F.test_tail, models = Object.keys(T).filter(k => !['dates','Actual Close','Naive'].includes(k));
+  const ps = [{name:'Actual', values:T['Actual Close'], color:css('--ink'), width:2}].concat(models.map((k,i) => ({name:k, values:T[k], color:css(SER[i % 4]), width:1.5})));
+  legend($('#lg-pred'), ps);
+  lineChart($('#ch-pred'), {x:T.dates, series:ps, yFmt: v => '$' + v.toFixed(v < 100 ? 2 : 0), h:240});
+  lineChart($('#ch-rsi'), {x:I.dates, series:[{name:'RSI 14', values:I.RSI14, color:css('--s1')}], yFmt: v => v.toFixed(0), h:240, yMin:0, yMax:100, refLines:[30,70]});
+  const best = Math.min(...F.regression.map(r => r['Close RMSE ($)']));
+  $('#tb-reg').innerHTML = `<table><tr><th>Model</th><th>Close RMSE</th><th>Close MAE</th><th>Open RMSE</th><th>Direction hit</th></tr>` +
+    F.regression.map(r => `<tr><td>${r.Model}${r['Close RMSE ($)']===best?' <span class="bull">✓ best</span>':''}</td><td>${usd(r['Close RMSE ($)'])}</td><td>${usd(r['Close MAE ($)'])}</td><td>${usd(r['Open RMSE ($)'])}</td><td>${pct(r['Direction hit-rate'])}</td></tr>`).join('') + '</table>';
+  $('#tb-clf').innerHTML = `<table><tr><th>Model</th><th>Accuracy</th><th>ROC AUC</th></tr>` +
+    F.classification.map(r => `<tr><td>${r.Model}</td><td>${pct(r.Accuracy)}</td><td>${num(r['ROC AUC'],3)}</td></tr>`).join('') + '</table>';
+}
+
+/* ---------- Signals ---------- */
+$('#tb-sig').innerHTML = `<table><tr><th>Ticker</th><th>Signal</th><th>Confidence</th><th>Last close</th><th>Pred. open</th><th>Pred. close</th><th>Pred. return</th><th>Model</th><th>As of</th></tr>` +
+  R.tickers.map(t => { const F = R.forecasts[t], s = F.signal, n = F.next_day;
+    return `<tr><td>${t}</td><td>${sigHTML(s)}</td><td>${pct(s.confidence,0)}</td><td>${usd(n.last_close)}</td><td>${usd(n.pred_open)}</td><td>${usd(n.pred_close)}</td><td>${n.pred_return>=0?'+':''}${pct(n.pred_return,2)}</td><td>${s.model}</td><td>${s.as_of}</td></tr>`; }).join('') + '</table>';
+
+/* ---------- Frontier ---------- */
+function drawFrontier(){
+  const host = $('#ch-fr'), W = host.clientWidth || 700, H = 440, m = {l:52, r:16, t:14, b:40};
+  const rv = R.random, fr = R.frontier, pf = R.performance;
+  const xs = rv.Volatility.concat(fr.Volatility), ys = rv.Return.concat(fr.Return);
+  let x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const px = (x1-x0)*.05, py = (y1-y0)*.07; x0 -= px; x1 += px; y0 -= py; y1 += py;
+  const X = v => m.l + (W-m.l-m.r)*(v-x0)/(x1-x0), Y = v => m.t + (H-m.t-m.b)*(1-(v-y0)/(y1-y0));
+  const sMin = Math.min(...rv.Sharpe), sMax = Math.max(...rv.Sharpe);
+  const ramp = ['#cde2fb','#9ec5f4','#6da7ec','#3987e5','#256abf','#184f95','#0d366b'];
+  const shade = s => ramp[Math.min(ramp.length-1, Math.floor((s-sMin)/(sMax-sMin+1e-9)*ramp.length))];
+  let s = `<svg viewBox="0 0 ${W} ${H}">`;
+  niceTicks(y0,y1).forEach(t => s += `<line x1="${m.l}" x2="${W-m.r}" y1="${Y(t)}" y2="${Y(t)}" stroke="${css('--grid')}"/><text x="${m.l-8}" y="${Y(t)+4}" text-anchor="end">${pct(t,0)}</text>`);
+  niceTicks(x0,x1,8).forEach(t => s += `<line x1="${X(t)}" x2="${X(t)}" y1="${H-m.b}" y2="${H-m.b+4}" stroke="${css('--axis')}"/><text x="${X(t)}" y="${H-m.b+16}" text-anchor="middle">${pct(t,0)}</text>`);
+  s += `<text x="${(W+m.l)/2}" y="${H-4}" text-anchor="middle">Volatility (σ, annualised)</text><text transform="translate(12 ${(H-m.b)/2}) rotate(-90)" text-anchor="middle">Expected return</text>`;
+  rv.Volatility.forEach((v,i) => s += `<circle cx="${X(v).toFixed(1)}" cy="${Y(rv.Return[i]).toFixed(1)}" r="2.2" fill="${shade(rv.Sharpe[i])}" opacity=".75"/>`);
+  s += `<path d="${fr.Volatility.map((v,i)=>`${i?'L':'M'}${X(v)},${Y(fr.Return[i])}`).join('')}" fill="none" stroke="${css('--ink')}" stroke-width="2"/>`;
+  const marks = [['Max Sharpe', css('--s2'), 'star'], ['Min Variance', css('--s3'), 'dia'], ['Equal Weight', css('--s4'), 'dot']];
+  marks.forEach(([n,c,shape]) => { const p = pf[n], cx = X(p.Volatility), cy = Y(p.Return);
+    const ring = css('--surface');
+    if (shape === 'star'){ const pts = [...Array(10)].map((_,k) => { const a = Math.PI/5*k - Math.PI/2, r = k%2 ? 5 : 11; return `${cx+r*Math.cos(a)},${cy+r*Math.sin(a)}`; }).join(' '); s += `<polygon points="${pts}" fill="${c}" stroke="${ring}" stroke-width="2"/>`; }
+    else if (shape === 'dia') s += `<rect x="${cx-7}" y="${cy-7}" width="14" height="14" transform="rotate(45 ${cx} ${cy})" fill="${c}" stroke="${ring}" stroke-width="2"/>`;
+    else s += `<circle cx="${cx}" cy="${cy}" r="7" fill="${c}" stroke="${ring}" stroke-width="2"/>`;
+    const right = cx > W - 120; s += `<text x="${right ? cx-16 : cx+14}" y="${cy+4}" text-anchor="${right?'end':'start'}" style="fill:var(--ink);font-weight:600;paint-order:stroke;stroke:var(--surface);stroke-width:4px">${n}</text>`; });
+  s += `<circle class="hl" r="5" fill="none" stroke="${css('--ink')}" stroke-width="1.5" opacity="0"/></svg>`;
+  host.innerHTML = s;
+  legend($('#lg-fr'), [{name:'Random portfolio (shade = Sharpe)', color:'#3987e5', dot:true}, {name:'Efficient frontier', color:css('--ink')}, {name:'Max Sharpe ★', color:css('--s2'), dot:true}, {name:'Min Variance ◆', color:css('--s3'), dot:true}, {name:'Equal Weight', color:css('--s4'), dot:true}]);
+  const svg = host.querySelector('svg'), tip = tipEl(host), hl = svg.querySelector('.hl');
+  const named = marks.map(([n]) => ({n, v:pf[n].Volatility, r:pf[n].Return, sh:pf[n].Sharpe}));
+  svg.addEventListener('mousemove', e => {
+    const b = svg.getBoundingClientRect(), mx = (e.clientX-b.left)*W/b.width, my = (e.clientY-b.top)*H/b.height;
+    let best = null, bd = 1e9;
+    named.forEach(p => { const d = Math.hypot(X(p.v)-mx, Y(p.r)-my); if (d < 16 && d < bd){ bd = d; best = p; } });
+    if (!best) rv.Volatility.forEach((v,i) => { const d = Math.hypot(X(v)-mx, Y(rv.Return[i])-my); if (d < bd){ bd = d; best = {n:'Random portfolio', v, r:rv.Return[i], sh:rv.Sharpe[i]}; } });
+    if (!best || bd > 18){ tip.style.opacity = 0; hl.setAttribute('opacity',0); return; }
+    hl.setAttribute('cx', X(best.v)); hl.setAttribute('cy', Y(best.r)); hl.setAttribute('opacity', 1);
+    tip.innerHTML = `<div class="t">${best.n}</div><div class="r"><span>Return</span><b>${pct(best.r)}</b></div><div class="r"><span>Volatility</span><b>${pct(best.v)}</b></div><div class="r"><span>Sharpe</span><b>${num(best.sh)}</b></div>`;
+    placeTip(tip, host, X(best.v)*b.width/W, Y(best.r)*b.height/H);
+  });
+  svg.addEventListener('mouseleave', () => { tip.style.opacity = 0; hl.setAttribute('opacity',0); });
+}
+$('#nrand').textContent = R.n_random ? R.n_random.toLocaleString() : R.random.Return.length.toLocaleString();
+
+/* ---------- Gain estimator ---------- */
+const G0 = R.gains[0], predR = G0['Predicted Return'], sd = (G0['High (+1 sd)'] - G0['Predicted Gain']) / G0.Capital, var95 = RK['VaR 95% (1d)'];
+function drawGain(){
+  const c = Math.max(0, +$('#capital').value || 0), caps = [...new Set([c, 10000, 50000, 100000])];
+  $('#tb-gain').innerHTML = `<table><tr><th>Capital</th><th>Predicted return</th><th>Predicted gain</th><th>Low (−1 sd)</th><th>High (+1 sd)</th><th>1-day VaR 95% loss</th></tr>` +
+    caps.map((k,i) => `<tr${i===0?' style="font-weight:600"':''}><td>${usd(k)}</td><td>${predR>=0?'+':''}${pct(predR,2)}</td><td>${usd(k*predR)}</td><td>${usd(k*(predR-sd))}</td><td>${usd(k*(predR+sd))}</td><td>${usd(-k*var95)}</td></tr>`).join('') + '</table>';
+}
+$('#capital').addEventListener('input', drawGain); drawGain();
+
+/* ---------- Risk ---------- */
+(function(){
+  const rows = Object.keys(R.risk), keys = Object.keys(R.risk[rows[0]]);
+  const isPct = k => /Return|Volatility|VaR|Drawdown/.test(k);
+  $('#tb-risk').innerHTML = `<table><tr><th>Metric</th>${rows.map(r => `<th>${r.replace(' Portfolio','')}</th>`).join('')}</tr>` +
+    keys.map(k => `<tr><td>${k}</td>${rows.map(r => `<td>${isPct(k) ? pct(R.risk[r][k],2) : num(R.risk[r][k])}</td>`).join('')}</tr>`).join('') + '</table>';
+})();
+function drawDD(){ lineChart($('#ch-dd'), {x:R.growth.dates, series:[{name:'Drawdown', values:R.drawdown, color:css('--bad'), width:1.5}], yFmt: v => pct(v,0), h:220, area:true, yMax:0}); }
+
+/* ---------- Project ---------- */
+$('#mods').innerHTML = [
+  ['1 · Data acquisition','src/data_loader.py','yfinance OHLCV, S&P 500, 13-wk T-bill'],
+  ['2 · Technical indicators','src/indicators.py','SMA, EMA, MACD, RSI, Stochastic, Bollinger, ATR'],
+  ['3 · Price prediction','src/forecast.py','Linear, Random Forest, XGBoost, LSTM (optional)'],
+  ['4 · Bull / bear detection','src/forecast.py','RF / XGBoost / Logistic classifiers + confidence'],
+  ['5 · Modern Portfolio Theory','src/optimizer.py','returns, covariance, Rp, σp, Sharpe'],
+  ['6 · Optimisation','src/optimizer.py','SciPy SLSQP: max Sharpe, min variance'],
+  ['7 · Efficient frontier','src/optimizer.py','10,000 random portfolios + exact frontier'],
+  ['8 · Daily gain estimator','src/gain_estimator.py','capital × predicted return, ±1 sd, VaR'],
+  ['9 · Risk metrics','src/risk.py','VaR, CVaR, drawdown, beta, Treynor, Sortino'],
+  ['10 · Dash dashboard','dashboard/app.py','Plotly / Dash web app, 6 tabs'],
+].map(([a,b,c]) => `<div class="mod"><b>${a}</b><code>${b}</code><div class="note">${c}</div></div>`).join('');
+$('#tree').textContent = `PortfolioOptimization/
+├── config.py               tickers, dates, risk-free, weight cap
+├── run.py                  full pipeline: python run.py (F5 in VS Code)
+├── setup.bat               one-time environment setup
+├── requirements.txt
+├── data/                   historical_prices.csv (written by run.py)
+├── notebooks/
+│   ├── 01_ma_crossover_strategy.ipynb   ← your original strategy, fixed
+│   ├── 02_data_collection.ipynb
+│   ├── 03_forecasting.ipynb
+│   ├── 04_portfolio_optimization.ipynb
+│   └── legacy/Build_a_simple_trading_strategy_original.ipynb
+├── src/
+│   ├── data_loader.py   indicators.py   features.py
+│   ├── forecast.py      lstm_model.py   optimizer.py
+│   ├── risk.py          gain_estimator.py   strategy.py
+│   ├── pipeline.py
+│   └── report.py
+├── dashboard/app.py        Dash web app (+ assets/style.css)
+├── scripts/build_preview.py   rebuilds this page from reports/results.json
+├── docs/preview.html
+├── models/                 saved models (.keras / .joblib)
+└── tests/test_core.py      pytest suite`;
+
+/* ---------- draw ---------- */
+function drawAll(){ drawGrowth(); drawForecast(); drawFrontier(); drawDD(); }
+drawAll();
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+</script>
+</body>
+</html>

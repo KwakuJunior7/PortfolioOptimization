@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Setup: create .venv and install requirements",
+      "type": "shell",
+      "windows": { "command": ".\\setup.bat" },
+      "linux": { "command": "bash setup.sh" },
+      "osx": { "command": "bash setup.sh" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run full pipeline",
+      "type": "shell",
+      "windows": { "command": ".\\.venv\\Scripts\\python.exe run.py" },
+      "linux": { "command": ".venv/bin/python run.py" },
+      "osx": { "command": ".venv/bin/python run.py" },
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Launch dashboard",
+      "type": "shell",
+      "windows": { "command": ".\\.venv\\Scripts\\python.exe dashboard\\app.py" },
+      "linux": { "command": ".venv/bin/python dashboard/app.py" },
+      "osx": { "command": ".venv/bin/python dashboard/app.py" },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Run tests",
+      "type": "shell",
+      "windows": { "command": ".\\.venv\\Scripts\\python.exe -m pytest -q tests" },
+      "linux": { "command": ".venv/bin/python -m pytest -q tests" },
+      "osx": { "command": ".venv/bin/python -m pytest -q tests" },
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

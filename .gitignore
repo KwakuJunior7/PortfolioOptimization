@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+.env
+*.egg-info/
+.pytest_cache/
+.DS_Store
+Thumbs.db
+# generated artefacts
+models/*
+!models/.gitkeep
+reports/results.json
+data/*.csv
+!data/.gitkeep
+!data/sample_prices.csv
+reports/pipeline.log
+.vscode/*.log

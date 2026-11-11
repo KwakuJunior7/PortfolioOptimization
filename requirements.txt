@@ -1,0 +1,22 @@
+# core
+numpy>=1.24
+pandas>=2.1
+scipy>=1.10
+scikit-learn>=1.3
+joblib>=1.3
+yfinance>=0.2.40
+matplotlib>=3.7
+seaborn>=0.12
+# dashboard
+dash>=2.14
+plotly>=5.18
+# boosted trees (optional but recommended)
+xgboost>=2.0
+# optional alternative data sources (not required by the pipeline)
+# pandas-datareader>=0.10
+# alpha_vantage>=2.3
+# tests / notebooks
+pytest>=7.4
+jupyter>=1.0
+# deep learning (optional, large install) - uncomment for the LSTM model
+# tensorflow>=2.15
