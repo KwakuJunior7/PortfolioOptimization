@@ -34,6 +34,8 @@ All of it is served through a Dash web dashboard. The models are judged against 
 - [Limitations & roadmap](#limitations--roadmap)
 - [Project structure](#project-structure)
 
+**Live interactive preview:** https://kwakujunior7.github.io/PortfolioOptimization/preview.html
+
 ---
 
 ## Results at a glance
@@ -197,7 +199,7 @@ flowchart LR
 ### Command line
 
 ```bash
-git clone https://github.com/<your-username>/PortfolioOptimization.git
+git clone https://github.com/KwakuJunior7/PortfolioOptimization.git
 cd PortfolioOptimization
 python -m venv .venv
 .venv\Scripts\activate            # macOS/Linux: source .venv/bin/activate
@@ -262,7 +264,6 @@ PortfolioOptimization/
 │   └── report.py        CSVs, charts, summary, saved models
 ├── dashboard/            Dash app + stylesheet
 ├── notebooks/            01 MA crossover · 02 data · 03 forecasting · 04 portfolio
-│   └── legacy/           original notebook, unchanged
 ├── reports/              RESULTS_SUMMARY.md + tables/*.csv
 ├── docs/                 preview.html + images/
 ├── scripts/              build_preview.py
