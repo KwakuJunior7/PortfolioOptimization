@@ -277,7 +277,10 @@ PortfolioOptimization/
 Python · pandas · NumPy · SciPy · scikit-learn · XGBoost · TensorFlow/Keras (optional) · yfinance · Plotly · Dash · Matplotlib · pytest
 
 ## Skills demonstrated
-
+Author: Junior Owusu Ansah
+Degree: M.S. Computer Science / MBA Finance — New Mexico Highlands University
+Contact: Owususjunior7@gmail.com | jowusuansah@live.nmhu.edu
+Date: August 2026
 Quantitative finance · Modern Portfolio Theory · risk management (VaR/CVaR) · machine learning · time-series forecasting · model evaluation against baselines · data visualisation · dashboard development · modular, tested Python
 
 ## License
